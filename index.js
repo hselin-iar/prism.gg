@@ -260,3 +260,21 @@ function getAccuracy([r1,g1,b1],[r2,g2,b2]){
   scoreEl.innerHTML = score.toFixed(2);
 }
 
+/////////////////////////////////////////////////////////////////////
+// Share progress and website link                                 //
+/////////////////////////////////////////////////////////////////////
+
+const postBtn = document.getElementById("post-btn");
+const nameInput = document.getElementById("name-input");
+
+postBtn.addEventListener('click', () => {
+
+    const playerName = nameInput.value.trim() || "Someone";
+    const finalScoreText = document.getElementById("final-score").innerText; 
+
+    const rawMessage = `${playerName} scored ${finalScoreText} on Prism.gg!🤙\nCan you beat their color memory?\nGive it a try : https://prismgg.vercel.app/`;
+    const encodedMessage = encodeURIComponent(rawMessage);
+
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+});
