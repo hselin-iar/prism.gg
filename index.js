@@ -1,0 +1,262 @@
+let gameData = [];
+
+let currentRound = 0;
+const maxRounds = 5;
+
+const heroPage = document.getElementById("heropage");
+const countdownPage = document.getElementById("countdownpage");
+const colortimerPage = document.getElementById("colortimer");
+const colorpickPage = document.getElementById("custom-card");
+const roundresultPage = document.getElementById("result-card");
+const finalPage = document.getElementById("finalpage");
+
+function hideAllScreens() {
+    heroPage.classList.add("hidden");
+    countdownPage.classList.add("hidden");
+    colortimerPage.classList.add("hidden");
+    colorpickPage.classList.add("hidden");
+    roundresultPage.classList.add("hidden");
+    finalPage.classList.add("hidden");
+}
+
+function switchToPage(pageEl) {
+    hideAllScreens();
+    pageEl.classList.remove("hidden");
+}
+
+/////////////////////////////////////////////////////////////////////
+// Random Color Loader logic                                       //
+/////////////////////////////////////////////////////////////////////
+
+const startEl = document.querySelectorAll(".start");
+
+const cardEl = document.querySelectorAll(".card");
+
+const countdownEl = document.getElementById("countdown-card");
+
+const RoundNo = document.querySelectorAll(".onebyfive")
+
+let shownColor = "hsl(0,0%,0%)";
+
+switchToPage(heroPage);
+
+startEl.forEach(btn=> {
+  
+  btn.addEventListener('click', () => {
+
+    if (currentRound<maxRounds){
+
+      switchToPage(countdownPage);
+      setTimeout(()=>{
+        showRandomColor()},3000);
+
+      setTimeout(()=>countStage("set"),1500);
+      setTimeout(()=>countStage("go"),3000);
+
+      setTimeout(()=>{
+        countStage("ready");
+        switchToPage(colortimerPage);
+      },4000);
+
+
+      function countStage(text){
+        countdownEl.innerHTML = text;
+      }
+
+      setTimeout(()=>{
+        time = 600;
+        clearInterval(timerId);
+        timerId = setInterval(counter,10);
+      },3100);
+
+      currentRound++;
+
+      RoundNo.forEach(el=> {
+        el.innerHTML = `${currentRound} / 5`
+      });
+
+    }
+
+    else {
+
+      const roneEl = document.getElementById("r1");
+      const rtwoEl = document.getElementById("r2");
+      const rthreeEl = document.getElementById("r3");
+      const rfourEl = document.getElementById("r4");
+      const rfiveEl = document.getElementById("r5");
+
+      const finalScore = document.getElementById("final-score");
+      const upperText = document.getElementById("upper-text");
+
+      roneEl.style.backgroundImage = `linear-gradient(-45deg, ${gameData[0].inputColor} 50%, ${gameData[0].outputColor} 50%)`;
+
+      rtwoEl.style.backgroundImage = `linear-gradient(-45deg, ${gameData[1].inputColor} 50%, ${gameData[1].outputColor} 50%)`;
+
+      rthreeEl.style.backgroundImage = `linear-gradient(-45deg, ${gameData[2].inputColor} 50%, ${gameData[2].outputColor} 50%)`;
+
+      rfourEl.style.backgroundImage = `linear-gradient(-45deg, ${gameData[3].inputColor} 50%, ${gameData[3].outputColor} 50%)`;
+
+      rfiveEl.style.backgroundImage = `linear-gradient(-45deg, ${gameData[4].inputColor} 50%, ${gameData[4].outputColor} 50%)`;
+
+      const totalScore = gameData[0].roundScore + gameData[1].roundScore + gameData[2].roundScore + gameData[3].roundScore + gameData[4].roundScore;
+
+      finalScore.innerHTML = `${totalScore.toFixed(2)}</span> / 50`;
+
+      upperText.innerHTML = `Mmm almost ${Math.round(totalScore)} out of 50.`;
+
+      switchToPage(finalPage);
+      
+    }
+
+  });
+});
+
+function showRandomColor() {
+    const tempHue = Math.floor(Math.random() * (360 - 0 + 1)) + 0;
+    const tempSat = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
+    const tempBri = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
+
+    shownColor = `hsl(${tempHue},${tempSat}%, ${tempBri}%)`;
+
+    cardEl.forEach(el=> {
+    el.style.backgroundColor = shownColor;
+    });
+
+    setTimeout(()=>cardEl.forEach(el=> {
+      el.style.backgroundColor = 'rgb(0,0,0)';
+      }),7000);
+}
+
+const timerEl = document.getElementById("timer");
+let time = 600;
+let timerId;
+
+function counter() {
+      if (time>0){
+          time = time - 1;
+
+          let decimals = time % 100;
+          let formattedDecimals = decimals < 10 ? "0" + decimals : decimals;
+
+          timerEl.innerHTML = `${Math.floor(time/100)}<span style="color: rgb(255, 255, 255,.3);">${formattedDecimals}</span>`
+      }
+      else {
+        clearInterval(timerId);
+        switchToPage(colorpickPage);
+      }
+}
+
+
+/////////////////////////////////////////////////////////////////////
+//  Color Slider and Picker logic                                  //
+/////////////////////////////////////////////////////////////////////
+
+const root = document.documentElement;
+const hueSlider = document.getElementById('hue');
+const satSlider = document.getElementById('sat');
+const briSlider = document.getElementById('bri');
+const sliderParameter = document.getElementById('slider-parameter');
+
+const customCard = document.getElementById("custom-card");
+
+function updateColors(slider) {
+  let h = hueSlider.value;
+  let s = satSlider.value;
+  let b = briSlider.value;
+  
+  sliderParameter.innerHTML = slider;
+
+  root.style.setProperty('--h', h);
+  root.style.setProperty('--s', `${s}%`);
+  root.style.setProperty('--l', `${b / 2}%`); 
+
+  customCard.style.backgroundColor = `hsl(${h},${s}%,${b/2}%)`;
+}
+
+hueSlider.addEventListener('input', () => updateColors("HUE"));
+satSlider.addEventListener('input', () => updateColors("SATURATION"));
+briSlider.addEventListener('input', () => updateColors("BRIGHTNESS"));
+
+saveEl = document.getElementById("savebtn");
+let chosenColor = "";
+
+/////////////////////////////////////////////////////////////////////
+// Color Score Calculation logic                                   //
+/////////////////////////////////////////////////////////////////////
+
+const chosenColorEl = document.getElementById("chosen-color");
+const shownColorEl = document.getElementById("shown-color");
+
+const chosenColorCardEl = document.getElementById("chosen-color-card");
+const resultCardEl = document.getElementById("result-card");
+
+const scoreEl = document.getElementById("score");
+
+saveEl.addEventListener('click', function(e){
+
+  e.preventDefault();
+  clearInterval(timerId);
+
+  let h = hueSlider.value;
+  let s = satSlider.value;
+  let b = briSlider.value;
+
+  chosenColor = `hsl(${h}, ${s}%, ${b/2}%)`;
+
+  const chosenColorValues = chosenColor
+        .slice(4,-1)
+        .split(',')
+        .map(parseFloat)
+
+  const shownColorValues = shownColor
+          .slice(4,-1)
+          .split(',')
+          .map(parseFloat)
+
+  const chosenColorRGB = hslToRgb(chosenColorValues);
+  const shownColorRGB = hslToRgb(shownColorValues);
+
+  getAccuracy(chosenColorRGB, shownColorRGB);
+
+  chosenColorEl.innerHTML = `H${chosenColorValues[0]} S${chosenColorValues[1]} B${chosenColorValues[2]*2}`;
+  shownColorEl.innerHTML = `H${shownColorValues[0]} S${shownColorValues[1]} B${shownColorValues[2]*2}`;
+
+  chosenColorCardEl.style.backgroundColor = chosenColor;
+  resultCardEl.style.backgroundColor = shownColor;
+
+  gameData.push({
+          inputColor : shownColor,
+          outputColor : chosenColor,
+          roundScore : Number(scoreEl.innerHTML)
+        });
+
+  shownColor = "hsl(0,0%,0%)";
+  chosenColor = "hsl(0,0%,0%)";
+
+  switchToPage(roundresultPage);
+
+})
+
+function hslToRgb([h, s, l]) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [255 * f(0), 255 * f(8), 255 * f(4)];
+  }
+
+
+function getAccuracy([r1,g1,b1],[r2,g2,b2]){
+  const distance = Math.sqrt(
+    Math.pow(r2 - r1, 2) +
+    Math.pow(g2 - g1, 2) +
+    Math.pow(b2 - b1, 2) 
+  );
+
+  const similarity = (Math.max(0,1 - (distance/441.67)))*10;  //441.67 is dist btw black n white
+
+  const score = parseFloat(similarity.toFixed(2));
+
+  scoreEl.innerHTML = score.toFixed(2);
+}
+
