@@ -204,6 +204,7 @@ const chosenColorCardEl = document.getElementById("chosen-color-card");
 const resultCardEl = document.getElementById("result-card");
 
 const scoreEl = document.getElementById("score");
+const roundMessageEl = document.querySelector("#result-card #heroText");
 
 saveEl.addEventListener('click', function(e){
 
@@ -242,6 +243,21 @@ saveEl.addEventListener('click', function(e){
           outputColor : chosenColor,
           roundScore : Number(scoreEl.innerHTML)
         });
+
+  let currentScore = Number(scoreEl.innerHTML);
+  if (currentScore < 2) {
+    roundMessageEl.innerHTML = "Way off track! Are we seeing the same color?";
+  } else if (currentScore < 4) {
+    roundMessageEl.innerHTML = "A bit muddy. Try to focus on the exact hue.";
+  } else if (currentScore < 6) {
+    roundMessageEl.innerHTML = "Getting somewhere. Don't get excited – slowly.";
+  } else if (currentScore < 8) {
+    roundMessageEl.innerHTML = "Solid memory! You are getting close to it.";
+  } else if (currentScore < 9.5) {
+    roundMessageEl.innerHTML = "Very impressive! Almost an exact match now.";
+  } else {
+    roundMessageEl.innerHTML = "Perfect match! Your color vision is insane.";
+  }
 
   shownColor = "hsl(0,0%,0%)";
   chosenColor = "hsl(0,0%,0%)";
