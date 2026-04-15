@@ -232,7 +232,7 @@ button:hover{
 .bri-track {
     display: flex;
     border-style: none;
-  background: linear-gradient(to right, hsl(var(--h), var(--s), 0%), hsl(var(--h), var(--s), 50%));
+  background: linear-gradient(to right, hsl(var(--h), var(--s), 0%), hsl(var(--h), var(--s), 50%), hsl(var(--h), var(--s), 100%));
 }
 
 .easy-slider {

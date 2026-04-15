@@ -104,6 +104,19 @@ startEl.forEach(btn=> {
 
       upperText.innerHTML = `Mmm almost ${Math.round(totalScore)} out of 50.`;
 
+      const lowerText = document.getElementById("lower-text");
+      if (totalScore < 5) lowerText.innerHTML = "Were your eyes even open? That was rough.";
+      else if (totalScore < 10) lowerText.innerHTML = "Not too genius but hey – its the effort that counts.";
+      else if (totalScore < 15) lowerText.innerHTML = "A little muddy, but you got a few hues right.";
+      else if (totalScore < 20) lowerText.innerHTML = "Not bad, but your color memory needs some work.";
+      else if (totalScore < 25) lowerText.innerHTML = "Almost average! You have a decent eye.";
+      else if (totalScore < 30) lowerText.innerHTML = "Solid middle ground. You're getting the hang of it.";
+      else if (totalScore < 35) lowerText.innerHTML = "Pretty good! Your color recall is above average.";
+      else if (totalScore < 40) lowerText.innerHTML = "Great job! You have a very sharp eye.";
+      else if (totalScore < 45) lowerText.innerHTML = "Incredible memory! You must work with colors.";
+      else if (totalScore < 48) lowerText.innerHTML = "Basically a human color picker! Super impressive.";
+      else lowerText.innerHTML = "Absolute perfection! Your color vision is flawless.";
+
       switchToPage(finalPage);
       
     }
@@ -168,9 +181,9 @@ function updateColors(slider) {
 
   root.style.setProperty('--h', h);
   root.style.setProperty('--s', `${s}%`);
-  root.style.setProperty('--l', `${b / 2}%`); 
+  root.style.setProperty('--l', `${b}%`); 
 
-  customCard.style.backgroundColor = `hsl(${h},${s}%,${b/2}%)`;
+  customCard.style.backgroundColor = `hsl(${h},${s}%,${b}%)`;
 }
 
 hueSlider.addEventListener('input', () => updateColors("HUE"));
@@ -201,7 +214,7 @@ saveEl.addEventListener('click', function(e){
   let s = satSlider.value;
   let b = briSlider.value;
 
-  chosenColor = `hsl(${h}, ${s}%, ${b/2}%)`;
+  chosenColor = `hsl(${h}, ${s}%, ${b}%)`;
 
   const chosenColorValues = chosenColor
         .slice(4,-1)
@@ -218,8 +231,8 @@ saveEl.addEventListener('click', function(e){
 
   getAccuracy(chosenColorRGB, shownColorRGB);
 
-  chosenColorEl.innerHTML = `H${chosenColorValues[0]} S${chosenColorValues[1]} B${chosenColorValues[2]*2}`;
-  shownColorEl.innerHTML = `H${shownColorValues[0]} S${shownColorValues[1]} B${shownColorValues[2]*2}`;
+  chosenColorEl.innerHTML = `H${chosenColorValues[0]} S${chosenColorValues[1]} B${chosenColorValues[2]}`;
+  shownColorEl.innerHTML = `H${shownColorValues[0]} S${shownColorValues[1]} B${shownColorValues[2]}`;
 
   chosenColorCardEl.style.backgroundColor = chosenColor;
   resultCardEl.style.backgroundColor = shownColor;
@@ -284,9 +297,9 @@ function getAccuracy([r1,g1,b1],[r2,g2,b2]){
   const similarity = Math.max(0, 1 - (distance / 765));
 
   // 5. The Punishment Curve
-  // Squaring the similarity steepens the drop-off. 
-  // It stops players from getting a 7/10 for a completely random, muddy guess.
-  const score = Math.pow(similarity, 2) * 10;
+  // A gentler exponent (1.2 instead of 2) stops players from getting a 7/10 for a muddy guess 
+  // but doesn't over-punish accurate hues with imperfect lightness.
+  const score = Math.pow(similarity, 1.2) * 10;
 
   scoreEl.innerHTML = score.toFixed(2);
   return parseFloat(score.toFixed(2));
@@ -305,7 +318,8 @@ const nameInput = document.getElementById("name-input");
 
 postBtn.addEventListener('click', () => {
 
-    const playerName = nameInput.value.trim() || "Someone";
+    let playerName = nameInput.value.trim() || "Someone";
+    playerName = playerName.charAt(0).toUpperCase() + playerName.slice(1);
     const finalScoreText = document.getElementById("final-score").innerText; 
 
     const rawMessage = `${playerName} scored ${finalScoreText} on Prism.gg!🤙\nCan you beat their color memory?\nGive it a try : https://prismgg.vercel.app/`;
