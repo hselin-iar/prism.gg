@@ -247,22 +247,58 @@ function hslToRgb([h, s, l]) {
 
 
 function getAccuracy([r1,g1,b1],[r2,g2,b2]){
-  const distance = Math.sqrt(
-    Math.pow(r2 - r1, 2) +
-    Math.pow(g2 - g1, 2) +
-    Math.pow(b2 - b1, 2) 
-  );
 
-  const similarity = (Math.max(0,1 - (distance/441.67)))*10;  //441.67 is dist btw black n white
+  //EUCLIDEAN METHOD OF COLOR ACCURACY CALCULATION IS NOT WORKING THAT GOOD
 
-  const score = parseFloat(similarity.toFixed(2));
+  // const distance = Math.sqrt(
+  //   Math.pow(r2 - r1, 2) +
+  //   Math.pow(g2 - g1, 2) +
+  //   Math.pow(b2 - b1, 2) 
+  // );
+
+  // const similarity = (Math.max(0,1 - (distance/441.67)))*10;  //441.67 is dist btw black n white
+
+  // const score = parseFloat(similarity.toFixed(2));
+
+  // scoreEl.innerHTML = score.toFixed(2);
+
+
+  //USING ANOTHER METHOD SOMETHING CALLED REDMEAN ALGORITHM THAT I FOUND ONLINE 
+
+  const rMean = (r1 + r2) / 2;
+
+  const r = r1 - r2;
+  const g = g1 - g2;
+  const b = b1 - b2;
+
+  // 2. Apply human perceptual weights
+  // Green gets a static heavy weight (4.0) because our eyes are most sensitive to it
+  const weightR = 2 + (rMean / 256);
+  const weightG = 4.0;
+  const weightB = 2 + ((255 - rMean) / 256);
+
+  // 3. Calculate the weighted perceptual distance
+  const distance = Math.sqrt((weightR * r * r) + (weightG * g * g) + (weightB * b * b));
+
+  // 4. Convert to a 0-1 score (765 is roughly the max distance in this model)
+  const similarity = Math.max(0, 1 - (distance / 765));
+
+  // 5. The Punishment Curve
+  // Squaring the similarity steepens the drop-off. 
+  // It stops players from getting a 7/10 for a completely random, muddy guess.
+  const score = Math.pow(similarity, 2) * 10;
 
   scoreEl.innerHTML = score.toFixed(2);
+  return parseFloat(score.toFixed(2));
+
 }
+
+
 
 /////////////////////////////////////////////////////////////////////
 // Share progress and website link                                 //
 /////////////////////////////////////////////////////////////////////
+
 
 const postBtn = document.getElementById("post-btn");
 const nameInput = document.getElementById("name-input");
